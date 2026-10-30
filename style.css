@@ -12,17 +12,12 @@
   --text-tertiary: #9ca3af;
   --primary: #111827;
   --accent: #2563eb;
-  --accent-soft: #eff6ff;
   --danger: #dc2626;
   --danger-soft: rgba(220, 38, 38, 0.92);
   --warning: #ea580c;
   --warning-soft: rgba(234, 88, 12, 0.92);
   --shadow: 0 10px 30px rgba(15, 23, 42, 0.07);
   --shadow-soft: 0 6px 18px rgba(15, 23, 42, 0.05);
-  --radius-xl: 24px;
-  --radius-lg: 20px;
-  --radius-md: 16px;
-  --radius-sm: 12px;
 }
 
 html, body {
@@ -57,8 +52,8 @@ textarea {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 12px;
-  margin-bottom: 18px;
+  gap: 14px;
+  margin-bottom: 20px;
 }
 
 .topbar h1 {
@@ -76,10 +71,18 @@ textarea {
   color: var(--text-secondary);
 }
 
+.topbar-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
 .count-chip {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  width: fit-content;
   min-width: 52px;
   height: 34px;
   padding: 0 12px;
@@ -90,6 +93,32 @@ textarea {
   font-weight: 800;
   border: 1px solid var(--border);
   box-shadow: var(--shadow-soft);
+}
+
+.filter-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.filter-chip {
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-secondary);
+  height: 34px;
+  padding: 0 14px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: var(--shadow-soft);
+  transition: all 0.15s ease;
+}
+
+.filter-chip.active {
+  background: var(--primary);
+  color: #ffffff;
+  border-color: var(--primary);
 }
 
 #content.is-empty {
@@ -132,15 +161,15 @@ textarea {
 .grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 14px;
+  gap: 15px;
 }
 
 .card {
   background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 22px;
+  border: 1px solid #e9edf4;
+  border-radius: 24px;
   overflow: hidden;
-  box-shadow: var(--shadow-soft);
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.055);
   cursor: pointer;
   transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
 }
@@ -152,7 +181,7 @@ textarea {
 .thumb-wrap {
   position: relative;
   width: 100%;
-  aspect-ratio: 0.96 / 1;
+  aspect-ratio: 0.95 / 1;
   background: #edf2f7;
 }
 
@@ -170,17 +199,16 @@ textarea {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 52px;
-  height: 28px;
+  min-width: 50px;
+  height: 26px;
   padding: 0 10px;
   border-radius: 999px;
-  background: rgba(17, 24, 39, 0.82);
+  background: rgba(51, 65, 85, 0.9);
   color: #ffffff;
   font-size: 12px;
   font-weight: 800;
   letter-spacing: -0.01em;
-  backdrop-filter: blur(10px);
-  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.18);
+  box-shadow: 0 8px 16px rgba(15, 23, 42, 0.14);
 }
 
 .card-badge.soon {
@@ -192,7 +220,7 @@ textarea {
 }
 
 .card-body {
-  padding: 12px 12px 13px;
+  padding: 13px 13px 14px;
 }
 
 .card-brand {
@@ -201,7 +229,7 @@ textarea {
   line-height: 1.35;
   color: var(--text);
   letter-spacing: -0.02em;
-  margin-bottom: 5px;
+  margin-bottom: 4px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -211,7 +239,8 @@ textarea {
   font-size: 13px;
   line-height: 1.45;
   color: var(--text-secondary);
-  margin-bottom: 8px;
+  margin-bottom: 7px;
+  min-height: 18px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
