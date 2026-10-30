@@ -9,6 +9,7 @@ const modal = document.getElementById('modal');
 const modalImage = document.getElementById('modalImage');
 const modalDday = document.getElementById('modalDday');
 const modalSubtext = document.getElementById('modalSubtext');
+const brandInput = document.getElementById('brandInput');
 const memoInput = document.getElementById('memoInput');
 const expireInput = document.getElementById('expireInput');
 const ocrText = document.getElementById('ocrText');
@@ -172,7 +173,8 @@ function render() {
               <div class="ocr-badge">${item.expireDate ? '날짜 인식/입력 완료' : '날짜 확인 필요'}</div>
             </div>
             <div class="card-body">
-              <div class="memo">${escapeHtml(item.memo || '메모 없음')}</div>
+              <div class="memo">${escapeHtml(item.brand || '브랜드 미인식')}</div>
+              <div class="expire-date" style="margin-bottom: 10px;">${escapeHtml(item.memo || '메모 없음')}</div>
               <div class="dday-row">
                 <div class="dday ${dday.className}">${dday.text}</div>
                 <div class="expire-date">${item.expireDate || '날짜 없음'}</div>
@@ -194,6 +196,7 @@ function openDetail(index) {
   modalDday.textContent = dday.text;
   modalDday.className = `big-dday ${dday.className}`;
   modalSubtext.textContent = formatDate(item.expireDate);
+  brandInput.value = item.brand || '';
   memoInput.value = item.memo || '';
   expireInput.value = item.expireDate || '';
   ocrText.value = item.ocrRawText || '';
@@ -263,6 +266,7 @@ async function addFiles(files) {
     const newItem = {
       id: Date.now() + Math.random(),
       image: imageData,
+      brand: '',
       memo: '',
       expireDate: '',
       ocrRawText: '날짜 인식 중...'
@@ -284,8 +288,8 @@ async function addFiles(files) {
       items[targetIndex].expireDate = ocrResult.foundDate;
     }
 
-    if (ocrResult.foundBrand && !items[targetIndex].memo) {
-      items[targetIndex].memo = ocrResult.foundBrand;
+    if (ocrResult.foundBrand) {
+      items[targetIndex].brand = ocrResult.foundBrand;
     }
 
     saveItems();
@@ -317,6 +321,7 @@ fileInput.addEventListener('change', async (e) => {
 saveBtn.addEventListener('click', () => {
   if (selectedIndex === null) return;
 
+  items[selectedIndex].brand = brandInput.value.trim();
   items[selectedIndex].memo = memoInput.value.trim();
   items[selectedIndex].expireDate = expireInput.value;
 
