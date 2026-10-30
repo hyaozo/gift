@@ -183,6 +183,12 @@ body {
   min-height: 38px;
 }
 
+.sub-memo {
+  margin-top: 4px;
+  font-size: 13px;
+  color: #666;
+}
+
 .dday-row {
   display: flex;
   justify-content: space-between;
