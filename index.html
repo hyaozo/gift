@@ -4,34 +4,34 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>기프티콘 보관함</title>
-  <link rel="stylesheet" href="style.css?v=10" />
+  <link rel="stylesheet" href="style.css?v=7" />
   <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 </head>
 <body>
   <div class="app">
     <header class="topbar">
-  <div>
-    <h1>기프티콘 보관함</h1>
-    <p>업로드하고, 날짜를 자동 인식하고, 만료 전 확인하세요</p>
-  </div>
+      <div>
+        <h1>기프티콘 보관함</h1>
+        <p>업로드하고, 날짜를 자동 인식하고, 만료 전 확인하세요</p>
+      </div>
 
-  <div class="topbar-meta">
-    <div class="count-chip" id="countChip">0개</div>
+      <div class="topbar-meta">
+        <div class="count-chip" id="countChip">0개</div>
 
-    <div class="filter-row">
-      <button class="filter-chip active" data-filter="all" id="filterAll">전체</button>
-      <button class="filter-chip" data-filter="soon" id="filterSoon">임박</button>
-      <button class="filter-chip" data-filter="expired" id="filterExpired">만료</button>
-    </div>
-  </div>
-</header>
+        <div class="filter-row">
+          <button class="filter-chip active" id="filterAll" type="button">전체</button>
+          <button class="filter-chip" id="filterSoon" type="button">임박</button>
+          <button class="filter-chip" id="filterExpired" type="button">만료</button>
+        </div>
+      </div>
+    </header>
 
     <main id="content"></main>
   </div>
 
   <input type="file" id="fileInput" accept="image/*" multiple />
 
-  <button class="fab" id="addBtn">+</button>
+  <button class="fab" id="addBtn" type="button">+</button>
 
   <div class="modal" id="modal">
     <div class="sheet">
@@ -51,7 +51,7 @@
 
       <div class="field">
         <label for="memoInput">메모</label>
-        <input type="text" id="memoInput" placeholder="예: 아이스 아메리카노 1잔" />
+        <textarea id="memoInput" rows="3" placeholder="예: 아이스 아메리카노 1잔"></textarea>
       </div>
 
       <div class="field">
@@ -65,16 +65,16 @@
       </div>
 
       <div class="action-row">
-        <button class="btn ghost" id="closeBtn">닫기</button>
-        <button class="btn primary" id="saveBtn">저장</button>
+        <button class="btn ghost" id="closeBtn" type="button">닫기</button>
+        <button class="btn primary" id="saveBtn" type="button">저장</button>
       </div>
 
       <div class="action-row single">
-        <button class="btn danger" id="deleteBtn">삭제</button>
+        <button class="btn danger" id="deleteBtn" type="button">삭제</button>
       </div>
     </div>
   </div>
 
-  <script src="script.js?v=35"></script>
+  <script src="script.js?v=7"></script>
 </body>
 </html>
