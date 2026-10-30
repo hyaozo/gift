@@ -18,6 +18,8 @@ const deleteBtn = document.getElementById('deleteBtn');
 
 let items = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
 let selectedIndex = null;
+let pressTimer = null;
+let isLongPress = false;
 
 function saveItems() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
@@ -44,6 +46,44 @@ function extractDate(text) {
     const match = cleaned.match(pattern);
     if (match) {
       return normalizeDateString(match[1], match[2], match[3]);
+    }
+  }
+
+  return '';
+}
+
+function extractBrand(text) {
+  if (!text) return '';
+
+  const brands = [
+    '스타벅스',
+    '이디야',
+    '투썸',
+    '투썸플레이스',
+    '메가커피',
+    '빽다방',
+    '컴포즈커피',
+    '할리스',
+    '엔제리너스',
+    '폴바셋',
+    '배스킨라빈스',
+    '던킨',
+    '파리바게뜨',
+    '뚜레쥬르',
+    '맘스터치',
+    '버거킹',
+    '맥도날드',
+    '롯데리아',
+    '서브웨이',
+    '교촌치킨',
+    '굽네치킨',
+    'BHC',
+    'bhc'
+  ];
+
+  for (const brand of brands) {
+    if (text.includes(brand)) {
+      return brand;
     }
   }
 
@@ -93,15 +133,18 @@ function render() {
   countChip.textContent = `${items.length}개`;
 
   if (items.length === 0) {
-    content.innerHTML = `
-      <div class="empty">
-        <div class="emoji">🎁</div>
-        <h2>기프티콘을 추가해보세요</h2>
-        <p>아래 + 버튼으로 사진을 올리면<br>보관하고 만료일을 관리할 수 있어요</p>
-      </div>
-    `;
-    return;
-  }
+  content.classList.add('is-empty');
+  content.innerHTML = `
+    <div class="empty">
+      <div class="emoji">🎁</div>
+      <h2>기프티콘을 추가해보세요</h2>
+      <p>아래 + 버튼으로 사진을 올리면<br>보관하고 만료일을 관리할 수 있어요</p>
+    </div>
+  `;
+  return;
+}
+
+content.classList.remove('is-empty');
 
   const sorted = [...items]
     .map((item, index) => ({ item, index }))
@@ -116,7 +159,13 @@ function render() {
       ${sorted.map(({ item, index }) => {
         const dday = getDday(item.expireDate);
         return `
-          <div class="card" onclick="openDetail(${index})">
+          <div class="card"
+     onclick="handleCardClick(${index})"
+     onmousedown="startPress(${index})"
+     onmouseup="cancelPress()"
+     onmouseleave="cancelPress()"
+     ontouchstart="startPress(${index})"
+     ontouchend="cancelPress()">
             <div class="thumb-wrap">
               <img class="thumb" src="${item.image}" alt="기프티콘 이미지" />
               <div class="ocr-badge">${item.expireDate ? '날짜 인식/입력 완료' : '날짜 확인 필요'}</div>
@@ -154,6 +203,35 @@ function openDetail(index) {
 function closeModal() {
   modal.classList.remove('show');
   selectedIndex = null;
+}
+
+function startPress(index) {
+  isLongPress = false;
+
+  clearTimeout(pressTimer);
+  pressTimer = setTimeout(() => {
+    isLongPress = true;
+
+    const ok = confirm('이 기프티콘을 삭제할까요?');
+    if (ok) {
+      items.splice(index, 1);
+      saveItems();
+      render();
+    }
+  }, 700);
+}
+
+function cancelPress() {
+  clearTimeout(pressTimer);
+}
+
+function handleCardClick(index) {
+  if (isLongPress) {
+    isLongPress = false;
+    return;
+  }
+
+  openDetail(index);
 }
 
 async function runOCR(imageDataUrl) {
@@ -198,6 +276,11 @@ async function addFiles(files) {
       items[insertedIndex].expireDate = ocrResult.foundDate;
     }
 
+const brand = extractBrand(ocrResult.text);
+if (brand && !items[insertedIndex].memo) {
+  items[insertedIndex].memo = brand;
+}
+    
     saveItems();
     render();
   }
