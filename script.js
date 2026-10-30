@@ -405,6 +405,9 @@ saveBtn.addEventListener('click', () => {
 deleteBtn.addEventListener('click', () => {
   if (selectedIndex === null) return;
 
+  const ok = confirm('이 기프티콘을 삭제할까요?');
+  if (!ok) return;
+
   items.splice(selectedIndex, 1);
   saveItems();
   render();
