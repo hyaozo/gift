@@ -17,10 +17,15 @@ const closeBtn = document.getElementById('closeBtn');
 const saveBtn = document.getElementById('saveBtn');
 const deleteBtn = document.getElementById('deleteBtn');
 
+const filterAll = document.getElementById('filterAll');
+const filterSoon = document.getElementById('filterSoon');
+const filterExpired = document.getElementById('filterExpired');
+
 let items = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
 let selectedIndex = null;
 let pressTimer = null;
 let isLongPress = false;
+let currentFilter = 'all';
 
 function saveItems() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
@@ -164,6 +169,12 @@ function escapeHtml(text) {
     .replace(/'/g, '&#039;');
 }
 
+function updateFilterButtons() {
+  filterAll.classList.toggle('active', currentFilter === 'all');
+  filterSoon.classList.toggle('active', currentFilter === 'soon');
+  filterExpired.classList.toggle('active', currentFilter === 'expired');
+}
+
 function render() {
   countChip.textContent = `${items.length}개`;
 
@@ -179,15 +190,45 @@ function render() {
     return;
   }
 
+  const filtered = [...items]
+    .map((item, index) => ({ item, index }))
+    .filter(({ item }) => {
+      const dday = getDday(item.expireDate);
+
+      if (currentFilter === 'soon') {
+        return dday.className === 'soon';
+      }
+
+      if (currentFilter === 'expired') {
+        return dday.className === 'expired';
+      }
+
+      return true;
+    });
+
+  if (filtered.length === 0) {
+    content.classList.add('is-empty');
+    content.innerHTML = `
+      <div class="empty">
+        <div class="emoji">🗂️</div>
+        <h2>표시할 기프티콘이 없어요</h2>
+        <p>${currentFilter === 'soon'
+          ? '임박한 기프티콘이 없습니다'
+          : currentFilter === 'expired'
+          ? '만료된 기프티콘이 없습니다'
+          : '기프티콘을 추가해보세요'}</p>
+      </div>
+    `;
+    return;
+  }
+
   content.classList.remove('is-empty');
 
-  const sorted = [...items]
-    .map((item, index) => ({ item, index }))
-    .sort((a, b) => {
-      if (!a.item.expireDate) return 1;
-      if (!b.item.expireDate) return -1;
-      return new Date(a.item.expireDate) - new Date(b.item.expireDate);
-    });
+  const sorted = filtered.sort((a, b) => {
+    if (!a.item.expireDate) return 1;
+    if (!b.item.expireDate) return -1;
+    return new Date(a.item.expireDate) - new Date(b.item.expireDate);
+  });
 
   content.innerHTML = `
     <div class="grid">
@@ -378,10 +419,29 @@ modal.addEventListener('click', (e) => {
   }
 });
 
+filterAll.addEventListener('click', () => {
+  currentFilter = 'all';
+  updateFilterButtons();
+  render();
+});
+
+filterSoon.addEventListener('click', () => {
+  currentFilter = 'soon';
+  updateFilterButtons();
+  render();
+});
+
+filterExpired.addEventListener('click', () => {
+  currentFilter = 'expired';
+  updateFilterButtons();
+  render();
+});
+
 window.openDetail = openDetail;
 window.handleCardClick = handleCardClick;
 window.startPress = startPress;
 window.cancelPress = cancelPress;
 
+updateFilterButtons();
 migrateItems();
 render();
