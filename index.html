@@ -10,12 +10,21 @@
 <body>
   <div class="app">
     <header class="topbar">
-      <div>
-        <h1>기프티콘 보관함</h1>
-        <p>업로드하고, 날짜를 자동 인식하고, 만료 전 확인하세요</p>
-      </div>
-      <div class="count-chip" id="countChip">0개</div>
-    </header>
+  <div>
+    <h1>기프티콘 보관함</h1>
+    <p>업로드하고, 날짜를 자동 인식하고, 만료 전 확인하세요</p>
+  </div>
+
+  <div class="topbar-meta">
+    <div class="count-chip" id="countChip">0개</div>
+
+    <div class="filter-row">
+      <button class="filter-chip active" data-filter="all" id="filterAll">전체</button>
+      <button class="filter-chip" data-filter="soon" id="filterSoon">임박</button>
+      <button class="filter-chip" data-filter="expired" id="filterExpired">만료</button>
+    </div>
+  </div>
+</header>
 
     <main id="content"></main>
   </div>
