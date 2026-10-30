@@ -91,6 +91,40 @@ function extractBrand(text) {
   return '';
 }
 
+function migrateItems() {
+  let changed = false;
+
+  items = items.map(item => {
+    const nextItem = {
+      brand: '',
+      memo: '',
+      expireDate: '',
+      ocrRawText: '',
+      ...item
+    };
+
+    if (!nextItem.brand) {
+      const detectedBrand = extractBrand(nextItem.memo || nextItem.ocrRawText || '');
+
+      if (detectedBrand) {
+        nextItem.brand = detectedBrand;
+
+        if ((nextItem.memo || '').trim() === detectedBrand) {
+          nextItem.memo = '';
+        }
+
+        changed = true;
+      }
+    }
+
+    return nextItem;
+  });
+
+  if (changed) {
+    saveItems();
+  }
+}
+
 function getDday(dateString) {
   if (!dateString) return { text: '날짜 미설정', className: '' };
 
@@ -170,15 +204,12 @@ function render() {
                ontouchcancel="cancelPress()">
             <div class="thumb-wrap">
               <img class="thumb" src="${item.image}" alt="기프티콘 이미지" />
-              <div class="ocr-badge">${item.expireDate ? '날짜 인식/입력 완료' : '날짜 확인 필요'}</div>
+              <div class="card-badge ${dday.className}">${dday.text}</div>
             </div>
             <div class="card-body">
-              <div class="memo">${escapeHtml(item.brand || '브랜드 미인식')}</div>
-              <div class="expire-date" style="margin-bottom: 10px;">${escapeHtml(item.memo || '메모 없음')}</div>
-              <div class="dday-row">
-                <div class="dday ${dday.className}">${dday.text}</div>
-                <div class="expire-date">${item.expireDate || '날짜 없음'}</div>
-              </div>
+              <div class="card-brand">${escapeHtml(item.brand || '브랜드 미인식')}</div>
+              <div class="card-memo">${escapeHtml(item.memo || '메모 없음')}</div>
+              <div class="card-date">${escapeHtml(item.expireDate || '날짜 없음')}</div>
             </div>
           </div>
         `;
@@ -352,4 +383,5 @@ window.handleCardClick = handleCardClick;
 window.startPress = startPress;
 window.cancelPress = cancelPress;
 
+migrateItems();
 render();
