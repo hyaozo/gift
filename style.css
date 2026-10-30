@@ -50,9 +50,9 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 12px;
+  gap: 8px;
   padding-top: env(safe-area-inset-top);
-  margin-bottom: 20px;
+  margin-bottom: 14px;
   text-align: center;
   width: 100%;
 }
@@ -65,7 +65,7 @@ body {
 }
 
 .topbar p {
-  margin: 8px 0 0;
+  margin: 4px 0 0;
   font-size: 13px;
   line-height: 1.45;
   color: var(--sub);
@@ -96,7 +96,7 @@ body {
 }
 
 .empty {
-  margin-top: 56px;
+  margin-top: 8px;
   text-align: center;
   padding: 34px 20px;
   border-radius: 30px;
