@@ -133,18 +133,18 @@ function render() {
   countChip.textContent = `${items.length}개`;
 
   if (items.length === 0) {
-  content.classList.add('is-empty');
-  content.innerHTML = `
-    <div class="empty">
-      <div class="emoji">🎁</div>
-      <h2>기프티콘을 추가해보세요</h2>
-      <p>아래 + 버튼으로 사진을 올리면<br>보관하고 만료일을 관리할 수 있어요</p>
-    </div>
-  `;
-  return;
-}
+    content.classList.add('is-empty');
+    content.innerHTML = `
+      <div class="empty">
+        <div class="emoji">🎁</div>
+        <h2>기프티콘을 추가해보세요</h2>
+        <p>아래 + 버튼으로 사진을 올리면<br>보관하고 만료일을 관리할 수 있어요</p>
+      </div>
+    `;
+    return;
+  }
 
-content.classList.remove('is-empty');
+  content.classList.remove('is-empty');
 
   const sorted = [...items]
     .map((item, index) => ({ item, index }))
@@ -160,12 +160,13 @@ content.classList.remove('is-empty');
         const dday = getDday(item.expireDate);
         return `
           <div class="card"
-     onclick="handleCardClick(${index})"
-     onmousedown="startPress(${index})"
-     onmouseup="cancelPress()"
-     onmouseleave="cancelPress()"
-     ontouchstart="startPress(${index})"
-     ontouchend="cancelPress()">
+               onclick="handleCardClick(${index})"
+               onmousedown="startPress(${index})"
+               onmouseup="cancelPress()"
+               onmouseleave="cancelPress()"
+               ontouchstart="startPress(${index})"
+               ontouchend="cancelPress()"
+               ontouchcancel="cancelPress()">
             <div class="thumb-wrap">
               <img class="thumb" src="${item.image}" alt="기프티콘 이미지" />
               <div class="ocr-badge">${item.expireDate ? '날짜 인식/입력 완료' : '날짜 확인 필요'}</div>
@@ -207,8 +208,8 @@ function closeModal() {
 
 function startPress(index) {
   isLongPress = false;
-
   clearTimeout(pressTimer);
+
   pressTimer = setTimeout(() => {
     isLongPress = true;
 
@@ -239,15 +240,18 @@ async function runOCR(imageDataUrl) {
     const result = await Tesseract.recognize(imageDataUrl, 'kor+eng');
     const text = result.data.text || '';
     const foundDate = extractDate(text);
+    const foundBrand = extractBrand(text);
 
     return {
       text,
-      foundDate
+      foundDate,
+      foundBrand
     };
   } catch (error) {
     return {
       text: 'OCR 인식 실패',
-      foundDate: ''
+      foundDate: '',
+      foundBrand: ''
     };
   }
 }
@@ -257,6 +261,7 @@ async function addFiles(files) {
     const imageData = await readFileAsDataURL(file);
 
     const newItem = {
+      id: Date.now() + Math.random(),
       image: imageData,
       memo: '',
       expireDate: '',
@@ -267,20 +272,22 @@ async function addFiles(files) {
     saveItems();
     render();
 
-    const insertedIndex = 0;
+    const currentId = newItem.id;
     const ocrResult = await runOCR(imageData);
+    const targetIndex = items.findIndex(item => item.id === currentId);
 
-    items[insertedIndex].ocrRawText = ocrResult.text;
+    if (targetIndex === -1) continue;
+
+    items[targetIndex].ocrRawText = ocrResult.text;
 
     if (ocrResult.foundDate) {
-      items[insertedIndex].expireDate = ocrResult.foundDate;
+      items[targetIndex].expireDate = ocrResult.foundDate;
     }
 
-const brand = extractBrand(ocrResult.text);
-if (brand && !items[insertedIndex].memo) {
-  items[insertedIndex].memo = brand;
-}
-    
+    if (ocrResult.foundBrand && !items[targetIndex].memo) {
+      items[targetIndex].memo = ocrResult.foundBrand;
+    }
+
     saveItems();
     render();
   }
@@ -336,5 +343,8 @@ modal.addEventListener('click', (e) => {
 });
 
 window.openDetail = openDetail;
+window.handleCardClick = handleCardClick;
+window.startPress = startPress;
+window.cancelPress = cancelPress;
 
 render();
