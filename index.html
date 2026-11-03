@@ -15,7 +15,7 @@
   <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png" />
   <link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512.png" />
 
-  <link rel="stylesheet" href="style.css?v=7" />
+  <link rel="stylesheet" href="style.css?v=8" />
   <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 </head>
 <body>
@@ -33,6 +33,7 @@
           <button class="filter-chip active" id="filterAll" type="button">전체</button>
           <button class="filter-chip" id="filterSoon" type="button">임박</button>
           <button class="filter-chip" id="filterExpired" type="button">만료</button>
+          <button class="filter-chip" id="filterUsed" type="button">사용완료</button>
         </div>
       </div>
     </header>
@@ -80,12 +81,13 @@
         <button class="btn primary" id="saveBtn" type="button">저장</button>
       </div>
 
-      <div class="action-row single">
+      <div class="action-row">
+        <button class="btn success" id="usedBtn" type="button">사용완료</button>
         <button class="btn danger" id="deleteBtn" type="button">삭제</button>
       </div>
     </div>
   </div>
 
-  <script src="script.js?v=7"></script>
+  <script src="script.js?v=8"></script>
 </body>
 </html>
