@@ -15,7 +15,7 @@
   <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png" />
   <link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512.png" />
 
-  <link rel="stylesheet" href="style.css?v=8" />
+  <link rel="stylesheet" href="style.css?v=9" />
   <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 </head>
 <body>
@@ -58,7 +58,30 @@
 
       <div class="field">
         <label for="brandInput">브랜드명</label>
-        <input type="text" id="brandInput" placeholder="예: 스타벅스" />
+        <input type="text" id="brandInput" list="brandSuggestions" placeholder="예: 스타벅스" />
+        <datalist id="brandSuggestions">
+          <option value="스타벅스"></option>
+          <option value="메가MGC커피"></option>
+          <option value="이디야"></option>
+          <option value="투썸플레이스"></option>
+          <option value="빽다방"></option>
+          <option value="컴포즈커피"></option>
+          <option value="할리스"></option>
+          <option value="엔제리너스"></option>
+          <option value="폴바셋"></option>
+          <option value="배스킨라빈스"></option>
+          <option value="던킨"></option>
+          <option value="파리바게뜨"></option>
+          <option value="뚜레쥬르"></option>
+          <option value="맘스터치"></option>
+          <option value="버거킹"></option>
+          <option value="맥도날드"></option>
+          <option value="롯데리아"></option>
+          <option value="서브웨이"></option>
+          <option value="교촌치킨"></option>
+          <option value="굽네치킨"></option>
+          <option value="BHC"></option>
+        </datalist>
       </div>
 
       <div class="field">
@@ -88,6 +111,6 @@
     </div>
   </div>
 
-  <script src="script.js?v=8"></script>
+  <script src="script.js?v=9"></script>
 </body>
 </html>
