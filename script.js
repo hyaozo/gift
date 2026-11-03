@@ -16,10 +16,12 @@ const ocrText = document.getElementById('ocrText');
 const closeBtn = document.getElementById('closeBtn');
 const saveBtn = document.getElementById('saveBtn');
 const deleteBtn = document.getElementById('deleteBtn');
+const usedBtn = document.getElementById('usedBtn');
 
 const filterAll = document.getElementById('filterAll');
 const filterSoon = document.getElementById('filterSoon');
 const filterExpired = document.getElementById('filterExpired');
+const filterUsed = document.getElementById('filterUsed');
 
 let items = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
 let selectedIndex = null;
@@ -105,8 +107,14 @@ function migrateItems() {
       memo: '',
       expireDate: '',
       ocrRawText: '',
+      used: false,
       ...item
     };
+
+    if (typeof nextItem.used !== 'boolean') {
+      nextItem.used = false;
+      changed = true;
+    }
 
     if (!nextItem.brand) {
       const detectedBrand = extractBrand(nextItem.memo || nextItem.ocrRawText || '');
@@ -130,7 +138,8 @@ function migrateItems() {
   }
 }
 
-function getDday(dateString) {
+function getDday(dateString, used = false) {
+  if (used) return { text: '사용완료', className: 'used' };
   if (!dateString) return { text: '날짜 미설정', className: '' };
 
   const today = new Date();
@@ -156,7 +165,8 @@ function getDday(dateString) {
   return { text: `D-${diff}`, className: '' };
 }
 
-function formatDate(dateString) {
+function formatDate(dateString, used = false) {
+  if (used) return '이미 사용한 기프티콘입니다';
   return dateString ? `만료일 ${dateString}` : '만료일을 확인하거나 직접 입력해 주세요';
 }
 
@@ -173,6 +183,7 @@ function updateFilterButtons() {
   filterAll.classList.toggle('active', currentFilter === 'all');
   filterSoon.classList.toggle('active', currentFilter === 'soon');
   filterExpired.classList.toggle('active', currentFilter === 'expired');
+  filterUsed.classList.toggle('active', currentFilter === 'used');
 }
 
 function render() {
@@ -193,14 +204,18 @@ function render() {
   const filtered = [...items]
     .map((item, index) => ({ item, index }))
     .filter(({ item }) => {
-      const dday = getDday(item.expireDate);
+      const dday = getDday(item.expireDate, item.used);
 
       if (currentFilter === 'soon') {
-        return dday.className === 'soon';
+        return !item.used && dday.className === 'soon';
       }
 
       if (currentFilter === 'expired') {
-        return dday.className === 'expired';
+        return !item.used && dday.className === 'expired';
+      }
+
+      if (currentFilter === 'used') {
+        return item.used;
       }
 
       return true;
@@ -212,11 +227,15 @@ function render() {
       <div class="empty">
         <div class="emoji">🗂️</div>
         <h2>표시할 기프티콘이 없어요</h2>
-        <p>${currentFilter === 'soon'
-          ? '임박한 기프티콘이 없습니다'
-          : currentFilter === 'expired'
-          ? '만료된 기프티콘이 없습니다'
-          : '기프티콘을 추가해보세요'}</p>
+        <p>${
+          currentFilter === 'soon'
+            ? '임박한 기프티콘이 없습니다'
+            : currentFilter === 'expired'
+            ? '만료된 기프티콘이 없습니다'
+            : currentFilter === 'used'
+            ? '사용완료한 기프티콘이 없습니다'
+            : '기프티콘을 추가해보세요'
+        }</p>
       </div>
     `;
     return;
@@ -225,6 +244,8 @@ function render() {
   content.classList.remove('is-empty');
 
   const sorted = filtered.sort((a, b) => {
+    if (a.item.used && !b.item.used) return 1;
+    if (!a.item.used && b.item.used) return -1;
     if (!a.item.expireDate) return 1;
     if (!b.item.expireDate) return -1;
     return new Date(a.item.expireDate) - new Date(b.item.expireDate);
@@ -233,7 +254,7 @@ function render() {
   content.innerHTML = `
     <div class="grid">
       ${sorted.map(({ item, index }) => {
-        const dday = getDday(item.expireDate);
+        const dday = getDday(item.expireDate, item.used);
         return `
           <div class="card"
                onclick="handleCardClick(${index})"
@@ -262,16 +283,18 @@ function render() {
 function openDetail(index) {
   selectedIndex = index;
   const item = items[index];
-  const dday = getDday(item.expireDate);
+  const dday = getDday(item.expireDate, item.used);
 
   modalImage.src = item.image;
   modalDday.textContent = dday.text;
   modalDday.className = `big-dday ${dday.className}`;
-  modalSubtext.textContent = formatDate(item.expireDate);
+  modalSubtext.textContent = formatDate(item.expireDate, item.used);
   brandInput.value = item.brand || '';
   memoInput.value = item.memo || '';
   expireInput.value = item.expireDate || '';
   ocrText.value = item.ocrRawText || '';
+
+  usedBtn.textContent = item.used ? '사용취소' : '사용완료';
 
   modal.classList.add('show');
 }
@@ -341,7 +364,8 @@ async function addFiles(files) {
       brand: '',
       memo: '',
       expireDate: '',
-      ocrRawText: '날짜 인식 중...'
+      ocrRawText: '날짜 인식 중...',
+      used: false
     };
 
     items.unshift(newItem);
@@ -402,6 +426,16 @@ saveBtn.addEventListener('click', () => {
   closeModal();
 });
 
+usedBtn.addEventListener('click', () => {
+  if (selectedIndex === null) return;
+
+  items[selectedIndex].used = !items[selectedIndex].used;
+
+  saveItems();
+  render();
+  openDetail(selectedIndex);
+});
+
 deleteBtn.addEventListener('click', () => {
   if (selectedIndex === null) return;
 
@@ -436,6 +470,12 @@ filterSoon.addEventListener('click', () => {
 
 filterExpired.addEventListener('click', () => {
   currentFilter = 'expired';
+  updateFilterButtons();
+  render();
+});
+
+filterUsed.addEventListener('click', () => {
+  currentFilter = 'used';
   updateFilterButtons();
   render();
 });
