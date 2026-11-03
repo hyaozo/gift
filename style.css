@@ -445,3 +445,16 @@ textarea {
     font-size: 23px;
   }
 }
+
+.card-badge.used {
+  background: rgba(22, 163, 74, 0.92);
+}
+
+.big-dday.used {
+  color: #16a34a;
+}
+
+.btn.success {
+  background: #16a34a;
+  color: #ffffff;
+}
